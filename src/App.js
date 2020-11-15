@@ -1,20 +1,16 @@
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import './App.css';
 import Post from './Post'
+import db from './firebase'
 
 function App() {
-  const [posts, setPosts] = useState([
-    {
-      username: 'bobby_tito',
-      caption: 'Lets build the Instagram clone',
-      imageUrl: "https://lerablog.org/wp-content/uploads/2019/02/React-JS.jpg"
-    },
-    {
-      username: 'naan_tito',
-      caption: 'build the clone is awesome',
-      imageUrl: "https://lerablog.org/wp-content/uploads/2019/02/React-JS.jpg"
-    }
-  ])
+  const [posts, setPosts] = useState([])
+    useEffect(() => {
+      db.collection('posts').onSnapshot(snapshot => (
+        setPosts(snapshot.docs.map(doc => doc.data()))
+      ))
+    }, [])
+
 
   return (
     <div className="app">
@@ -25,7 +21,11 @@ function App() {
       </div>
       <h1>The instgram Logo</h1>
       {posts.map(post => (
-        <Post username={post.username} caption={post.caption} imageUrl={post.imageUrl}/>
+        <Post 
+          username={post.username} 
+          caption={post.caption}
+          imageUrl={post.imageUrl}
+        />
       ))}
     </div>
   );
