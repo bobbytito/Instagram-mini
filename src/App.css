@@ -4,7 +4,6 @@
 
 .app {
   background-color: #fafafa;
-  height: 100vh;
 }
 
 .app_header {
@@ -15,4 +14,13 @@
 
 .app_headerImage {
   height: 50px;
+}
+
+.form_logo {
+  height: 50px;
+}
+
+.app_form {
+  display: flex;
+  flex-direction: column;
 }
