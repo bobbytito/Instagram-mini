@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react'
 import './App.css';
 import Post from './Post'
-import db from './firebase'
+import {db, auth} from './firebase'
 import { makeStyles } from '@material-ui/core/styles'
 import Modal from '@material-ui/core/Modal'
 import { Button, Input } from '@material-ui/core';
@@ -37,6 +37,26 @@ function App() {
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null)
+  const [openSignIn, setOpenSignIn] = useState(false)
+
+  useEffect(() => {
+   const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        // user is logged in.....
+        console.log(authUser)
+        setUser(authUser)
+      } else {
+        // user has logged out....
+        setUser(null)
+      }
+
+    })
+    return () => {
+      //perform some cleanup actions
+      unsubscribe();
+    }
+  }, [user, username])
 
   //use effect function that connects to the database whenever the app runs
     useEffect(() => {
@@ -49,7 +69,24 @@ function App() {
     }, [])
 
     const signUp = (event) => {
+      event.preventDefault()
 
+      auth.createUserWithEmailAndPassword(email, password)
+      .then((authUser) => {
+        return authUser.user.updateProfile({
+          displayName: username
+        })
+      })
+      .catch((error) => alert(error.message))
+    }
+
+    const signIn = (event) => {
+      event.preventDefault()
+
+      auth.signInWithEmailAndPassword(email, password)
+      .catch((error) => alert(error.message))
+
+    setOpenSignIn(false)
     }
 
   return (
@@ -85,7 +122,37 @@ function App() {
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                 />
-                <Button onClick={signUp}>Sign Up</Button>
+                <Button type="submit" onClick={signUp}>Sign Up</Button>
+            </form>
+          </div>
+        </Modal>
+
+        <Modal
+        open={openSignIn}
+        onClose={()=> setOpenSignIn(false)}
+      >
+        
+          <div style={modalStyle} className={classes.paper}>
+            <form className="app_form">
+              <center>
+                <img className="form_logo"
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/800px-Instagram_logo.svg.png"
+                alt=""
+                />
+              </center>
+                <Input
+                  placeholder="email"
+                  type="text"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                />
+                <Input 
+                  placeholder="password"
+                  type="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                />
+                <Button type="submit" onClick={signIn}>Sign In</Button>
             </form>
           </div>
         </Modal>
@@ -96,7 +163,15 @@ function App() {
           />
       </div>
 
-      <Button onClick={()=>setOpen(true)}>Sign Up</Button>
+      { user ? (
+      <Button onClick={()=> auth.signOut()}>Logout</Button>
+      ): (
+      <div className="app_loginContainer">
+        <Button onClick={()=> setOpenSignIn(true)}>SignIn</Button>
+        <Button onClick={()=> setOpen(true)}>Sign Up</Button>
+      </div>
+      )}
+
       <h1>The instgram Logo</h1>
       {posts.map(({id, post}) => (
         <Post key={id}
