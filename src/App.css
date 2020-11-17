@@ -10,10 +10,13 @@
   background-color: white;
   padding: 20px;
   border-bottom: 1px solid lightgray;
+  display: flex;
+  justify-content: space-between;
 }
 
 .app_headerImage {
   height: 50px;
+  object-fit: contain;
 }
 
 .form_logo {

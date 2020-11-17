@@ -61,7 +61,7 @@ function App() {
 
   //use effect function that connects to the database whenever the app runs
     useEffect(() => {
-      db.collection('posts').onSnapshot(snapshot => {
+      db.collection('posts').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
         setPosts(snapshot.docs.map(doc => ({
           id: doc.id,
           post: doc.data()
@@ -92,12 +92,6 @@ function App() {
 
   return (
     <div className="app">
-
-      {user?.displayName ? (
-        <ImageUpload username={user.displayName}/>
-      ): (
-        <h3>You need to login to upload</h3>
-      )}
 
       <Modal
         open={open}
@@ -169,16 +163,17 @@ function App() {
           <img className="app_headerImage"
           src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/800px-Instagram_logo.svg.png"
           />
+          { user ? (
+          <Button onClick={()=> auth.signOut()}>Logout</Button>
+          ): (
+          <div className="app_loginContainer">
+            <Button onClick={()=> setOpenSignIn(true)}>SignIn</Button>
+            <Button onClick={()=> setOpen(true)}>Sign Up</Button>
+          </div>
+          )}
       </div>
 
-      { user ? (
-      <Button onClick={()=> auth.signOut()}>Logout</Button>
-      ): (
-      <div className="app_loginContainer">
-        <Button onClick={()=> setOpenSignIn(true)}>SignIn</Button>
-        <Button onClick={()=> setOpen(true)}>Sign Up</Button>
-      </div>
-      )}
+      
 
       <h1>The instgram Logo</h1>
       {posts.map(({id, post}) => (
@@ -189,6 +184,11 @@ function App() {
         />
       ))
     }
+     {user?.displayName ? (
+        <ImageUpload username={user.displayName}/>
+      ): (
+        <h3>You need to login to upload</h3>
+      )}
     </div>
   );
 }
