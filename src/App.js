@@ -64,11 +64,9 @@ function App() {
   //use effect function that connects to the database whenever the app runs
     useEffect(() => {
       db.collection('posts').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-        setPosts(snapshot.docs.map(doc => ({
-          id: doc.id,
-          post: doc.data()
-        })))
-    })
+        setPosts(snapshot.docs.map(doc => ({ id: doc.id, post: doc.data() })
+        ))
+      })
     }, [])
 
     const signUp = (event) => {
@@ -179,6 +177,7 @@ function App() {
         <div className="app_postleft">
             {posts.map(({id, post}) => (
               <Post key={id}
+              postId={id}
                 username={post.username} 
                 caption={post.caption}
                 imageUrl={post.imageUrl}
