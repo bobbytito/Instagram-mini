@@ -180,6 +180,7 @@ function App() {
               postId={id}
                 username={post.username} 
                 caption={post.caption}
+                user={user}
                 imageUrl={post.imageUrl}
               />
             ))
